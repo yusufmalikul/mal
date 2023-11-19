@@ -1,44 +1,29 @@
-#include <stdlib.h>
 #include <stdio.h>
-#include <unistd.h>
+#include <sys/_types/_null.h>
 
-#ifdef USE_READLINE
-  #include <readline/readline.h>
-  #include <readline/history.h>
-#else
-  #include <editline/readline.h>
-#endif
+char *READ(char name[]) { return name; }
+char *EVAL(char name[]) { return name; }
+char *PRINT(char name[]) { return name; }
+char *rep(char name[]) {
+  char *read = READ(name);
+  char *eval = EVAL(read);
+  char *print = PRINT(eval);
 
-char *READ(char prompt[]) {
-    char *line;
-    line = readline(prompt);
-    if (!line) return NULL; // EOF
-    add_history(line); // Add input to history.
-    return line;
+  return print;
 }
 
-char *EVAL(char *ast, void *env) {
-    return ast;
-}
-
-char *PRINT(char *exp) {
-    return exp;
-}
-
-int main()
-{
-    char *ast, *exp;
-    char prompt[100];
-
-    // Set the initial prompt
-    snprintf(prompt, sizeof(prompt), "user> ");
-
-    for(;;) {
-        ast = READ(prompt);
-        if (!ast) return 0;
-        exp = EVAL(ast, NULL);
-        puts(PRINT(exp));
-
-        free(ast); // Free input string
+int main() {
+  char input[1000];
+  while (1) {
+    printf("user> ");
+    if (fgets(input, sizeof(input), stdin) == NULL) {
+      break;
     }
+
+    printf("%s", rep(input));
+  }
+
+  puts("\nBYE!");
+
+  return 0;
 }
