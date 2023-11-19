@@ -1,11 +1,12 @@
+#include "linenoise/linenoise.h"
 #include <stdio.h>
 #include <sys/_types/_null.h>
 
-char *READ(char name[]) { return name; }
-char *EVAL(char name[]) { return name; }
-char *PRINT(char name[]) { return name; }
-char *rep(char name[]) {
-  char *read = READ(name);
+char *READ(char in[]) { return in; }
+char *EVAL(char in[]) { return in; }
+char *PRINT(char in[]) { return in; }
+char *rep(char in[]) {
+  char *read = READ(in);
   char *eval = EVAL(read);
   char *print = PRINT(eval);
 
@@ -13,14 +14,15 @@ char *rep(char name[]) {
 }
 
 int main() {
-  char input[1000];
-  while (1) {
-    printf("user> ");
-    if (fgets(input, sizeof(input), stdin) == NULL) {
-      break;
-    }
+  char *line;
+  linenoiseSetMultiLine(0);
+  linenoiseHistoryLoad("history.txt");
+  while ((line = linenoise("user> ")) != NULL) {
+    printf("%s\n", rep(line));
+    linenoiseHistoryAdd(line);
+    linenoiseHistorySave("history.txt");
 
-    printf("%s", rep(input));
+    linenoiseFree(line);
   }
 
   puts("\nBYE!");
